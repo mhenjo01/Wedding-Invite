@@ -12,7 +12,7 @@
 // ══════════════════════════════════════════
 // CONFIG — edit before deploying
 // ══════════════════════════════════════════
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwiY8DXAhW1I928rt9GT58T8pnnxt17bIxJSj5n94xqD2a6gFKoNFZ5Y3pvnBv1I2vL/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzJ-FtS2tIkV99MYI3T8vTM_OcqGchCzsYPVh8385AgVQPDaX_5c3X-mPIwqwz2gboQ/exec';
 const ACCESS_CODE = '';           // '' = no gate. Set e.g. 'smith2025' to require a code.
 const COUPLE_NAMES = '[COUPLE_NAME_1] & [COUPLE_NAME_2]'; // used in page title after access
 
