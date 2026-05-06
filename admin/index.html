@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>RSVP Admin Panel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;1,300&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --ivory: #faf7f2; --parchment: #f3ede3; --cream: #e8dfd0;
+      --sage: #7a8c6e; --sage-dark: #4d5e42; --blush: #c9a99a;
+      --ink: #2c2520; --ink-light: #6b5e57; --gold: #b8975a;
+      --error: #b94040; --success: #4d7c5a; --white: #ffffff;
+      --font-display: 'Cormorant Garamond', serif;
+      --font-body: 'Jost', sans-serif;
+    }
+    body { font-family: var(--font-body); font-weight: 300; background: var(--ivory); color: var(--ink); font-size: 15px; }
+
+    /* ── LOGIN GATE ── */
+    #login-screen {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      background: var(--parchment);
+    }
+    .login-box {
+      background: var(--white); border: 1px solid var(--cream); border-radius: 12px;
+      padding: 2.5rem; width: 100%; max-width: 360px; text-align: center;
+      box-shadow: 0 8px 40px rgba(44,37,32,.1);
+    }
+    .login-box h1 { font-family: var(--font-display); font-size: 1.8rem; font-style: italic; font-weight: 300; color: var(--ink); margin-bottom: .35rem; }
+    .login-box p  { font-size: .82rem; color: var(--ink-light); margin-bottom: 1.5rem; }
+    .login-box input {
+      width: 100%; padding: .75rem 1rem; border: 1.5px solid var(--cream); border-radius: 4px;
+      font-family: var(--font-body); font-size: 1rem; margin-bottom: .75rem;
+      text-align: center; letter-spacing: .1em; color: var(--ink); background: var(--ivory);
+    }
+    .login-box input:focus { outline: none; border-color: var(--sage); }
+    .login-error { font-size: .8rem; color: var(--error); margin-top: .4rem; min-height: 1.1em; }
+
+    /* ── SHARED BUTTON ── */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: .4rem;
+      font-family: var(--font-body); font-size: .78rem; font-weight: 500;
+      letter-spacing: .12em; text-transform: uppercase; border: none;
+      border-radius: 4px; padding: .7rem 1.5rem; cursor: pointer; transition: all .2s;
+      text-decoration: none;
+    }
+    .btn--primary   { background: var(--sage-dark); color: var(--white); }
+    .btn--primary:hover { background: var(--sage); }
+    .btn--outline   { background: transparent; color: var(--sage-dark); border: 1.5px solid var(--sage); }
+    .btn--outline:hover { background: var(--sage-dark); color: var(--white); }
+    .btn--danger    { background: var(--error); color: var(--white); }
+    .btn--sm        { padding: .45rem .9rem; font-size: .72rem; }
+    .btn--full      { width: 100%; }
+
+    /* ── APP SHELL (hidden until logged in) ── */
+    #app { display: none; }
+
+    /* ── TOP BAR ── */
+    .topbar {
+      background: var(--sage-dark); color: var(--white); padding: 1rem 1.5rem;
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .75rem;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .topbar__title { font-family: var(--font-display); font-size: 1.4rem; font-style: italic; font-weight: 300; }
+    .topbar__actions { display: flex; gap: .6rem; flex-wrap: wrap; }
+    .topbar .btn--outline { border-color: rgba(255,255,255,.5); color: var(--white); }
+    .topbar .btn--outline:hover { background: rgba(255,255,255,.15); }
+
+    /* ── STATS BAR ── */
+    .stats-bar {
+      background: var(--parchment); border-bottom: 1px solid var(--cream);
+      padding: .9rem 1.5rem; display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: center;
+    }
+    .stat { display: flex; flex-direction: column; }
+    .stat__value { font-size: 1.5rem; font-family: var(--font-display); font-weight: 300; color: var(--ink); line-height: 1; }
+    .stat__label { font-size: .68rem; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-light); margin-top: .2rem; }
+    .stat--yes .stat__value  { color: var(--success); }
+    .stat--no .stat__value   { color: var(--error); }
+    .stat--pend .stat__value { color: var(--gold); }
+    .stat-divider { width: 1px; height: 36px; background: var(--cream); }
+
+    /* ── CONTROLS ── */
+    .controls {
+      padding: 1rem 1.5rem; display: flex; gap: .75rem; flex-wrap: wrap; align-items: center;
+      border-bottom: 1px solid var(--cream); background: var(--white);
+    }
+    .controls input[type="search"] {
+      flex: 1; min-width: 180px; padding: .6rem 1rem;
+      border: 1.5px solid var(--cream); border-radius: 4px;
+      font-family: var(--font-body); font-size: .9rem; color: var(--ink); background: var(--ivory);
+    }
+    .controls input[type="search"]:focus { outline: none; border-color: var(--sage); }
+    .controls select {
+      padding: .6rem .9rem; border: 1.5px solid var(--cream); border-radius: 4px;
+      font-family: var(--font-body); font-size: .85rem; color: var(--ink);
+      background: var(--ivory); cursor: pointer;
+    }
+
+    /* ── TABLE WRAPPER ── */
+    .table-wrap { overflow-x: auto; padding: 0; }
+    table { width: 100%; border-collapse: collapse; font-size: .85rem; min-width: 800px; }
+    thead th {
+      background: var(--parchment); color: var(--ink); font-size: .68rem;
+      letter-spacing: .12em; text-transform: uppercase; font-weight: 500;
+      padding: .75rem 1rem; border-bottom: 2px solid var(--cream);
+      text-align: left; white-space: nowrap; cursor: pointer; user-select: none;
+    }
+    thead th:hover { background: var(--cream); }
+    thead th.sort-asc::after  { content: ' ↑'; color: var(--sage); }
+    thead th.sort-desc::after { content: ' ↓'; color: var(--sage); }
+    tbody tr { border-bottom: 1px solid var(--cream); transition: background .15s; }
+    tbody tr:hover { background: rgba(122,140,110,.06); }
+    tbody td { padding: .7rem 1rem; vertical-align: top; }
+    tbody td:first-child { font-weight: 400; }
+
+    /* Status badges */
+    .badge {
+      display: inline-block; padding: .2rem .65rem; border-radius: 2rem;
+      font-size: .7rem; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap;
+    }
+    .badge--yes     { background: rgba(77,124,90,.15); color: var(--success); }
+    .badge--no      { background: rgba(185,64,64,.12); color: var(--error); }
+    .badge--pending { background: rgba(184,151,90,.15); color: #8a6a28; }
+    .badge--confirmed { background: rgba(77,124,90,.25); color: var(--success); font-weight: 600; }
+
+    /* Status select in cell */
+    .status-select {
+      font-family: var(--font-body); font-size: .75rem; padding: .2rem .5rem;
+      border: 1px solid var(--cream); border-radius: 4px; background: var(--ivory);
+      cursor: pointer; color: var(--ink);
+    }
+
+    /* ── EMPTY STATE ── */
+    .empty-state { text-align: center; padding: 3rem; color: var(--ink-light); }
+    .empty-state p { font-size: .9rem; margin-top: .5rem; }
+
+    /* ── FOOTER ── */
+    .admin-footer {
+      padding: 1rem 1.5rem; font-size: .75rem; color: var(--ink-light);
+      border-top: 1px solid var(--cream); background: var(--white);
+      display: flex; gap: 1rem; justify-content: space-between; flex-wrap: wrap;
+    }
+
+    /* ── MODAL (row detail) ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(44,37,32,.5); z-index: 1000;
+      align-items: center; justify-content: center; padding: 1rem;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--white); border-radius: 12px; padding: 2rem;
+      max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto;
+      box-shadow: 0 16px 60px rgba(44,37,32,.2);
+    }
+    .modal h3 { font-family: var(--font-display); font-size: 1.5rem; font-style: italic; margin-bottom: 1.25rem; }
+    .modal-field { margin-bottom: .75rem; }
+    .modal-field label { display: block; font-size: .68rem; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-light); margin-bottom: .2rem; }
+    .modal-field p { font-size: .92rem; color: var(--ink); }
+    .modal-actions { display: flex; gap: .6rem; margin-top: 1.5rem; flex-wrap: wrap; }
+
+    [hidden] { display: none !important; }
+    @media (max-width: 600px) {
+      .topbar { flex-direction: column; align-items: flex-start; }
+      .stats-bar { gap: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ LOGIN SCREEN ══ -->
+<div id="login-screen">
+  <div class="login-box">
+    <h1>Admin Panel</h1>
+    <p>Enter the admin password to view RSVPs</p>
+    <input type="password" id="admin-pwd" placeholder="Password" autocomplete="current-password" maxlength="60" />
+    <button class="btn btn--primary btn--full" onclick="adminLogin()">Sign In</button>
+    <p class="login-error" id="login-error"></p>
+  </div>
+</div>
+
+<!-- ══ APP (hidden until auth) ══ -->
+<div id="app">
+
+  <!-- Top Bar -->
+  <div class="topbar">
+    <span class="topbar__title">✦ RSVP Admin</span>
+    <div class="topbar__actions">
+      <button class="btn btn--outline btn--sm" onclick="loadData()">↺ Refresh</button>
+      <button class="btn btn--outline btn--sm" onclick="exportCSV()">⬇ Export CSV</button>
+      <button class="btn btn--outline btn--sm" onclick="adminLogout()">Sign Out</button>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-bar" id="stats-bar">
+    <div class="stat stat--yes">
+      <span class="stat__value" id="stat-yes">—</span>
+      <span class="stat__label">Attending</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat">
+      <span class="stat__value" id="stat-plus">—</span>
+      <span class="stat__label">Plus Ones</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat">
+      <span class="stat__value" id="stat-total-guests">—</span>
+      <span class="stat__label">Total Seats</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat stat--no">
+      <span class="stat__value" id="stat-no">—</span>
+      <span class="stat__label">Declined</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat stat--pend">
+      <span class="stat__value" id="stat-pending">—</span>
+      <span class="stat__label">No Reply Yet</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat">
+      <span class="stat__value" id="stat-total">—</span>
+      <span class="stat__label">Total Responses</span>
+    </div>
+  </div>
+
+  <!-- Controls -->
+  <div class="controls">
+    <input type="search" id="search-input" placeholder="Search by name, email, phone…" oninput="renderTable()" />
+    <select id="filter-attendance" onchange="renderTable()">
+      <option value="">All Attendance</option>
+      <option value="Yes">Attending</option>
+      <option value="No">Declined</option>
+    </select>
+    <select id="filter-status" onchange="renderTable()">
+      <option value="">All Status</option>
+      <option value="Confirmed">Confirmed</option>
+      <option value="Pending">Pending</option>
+      <option value="Declined">Declined</option>
+    </select>
+    <select id="filter-dietary" onchange="renderTable()">
+      <option value="">All Dietary</option>
+      <option value="vegetarian">Vegetarian</option>
+      <option value="vegan">Vegan</option>
+      <option value="halal">Halal</option>
+      <option value="gluten-free">Gluten-free</option>
+      <option value="nut-allergy">Nut allergy</option>
+      <option value="other">Other</option>
+    </select>
+    <span id="result-count" style="font-size:.8rem;color:var(--ink-light);margin-left:auto;"></span>
+  </div>
+
+  <!-- Table -->
+  <div class="table-wrap">
+    <table id="rsvp-table">
+      <thead>
+        <tr>
+          <th onclick="sortBy(0)">#</th>
+          <th onclick="sortBy(1)">Name</th>
+          <th onclick="sortBy(4)">Attending</th>
+          <th onclick="sortBy(5)">+1</th>
+          <th onclick="sortBy(6)">Guest Name</th>
+          <th onclick="sortBy(7)">Dietary</th>
+          <th onclick="sortBy(2)">Email</th>
+          <th onclick="sortBy(3)">Phone</th>
+          <th onclick="sortBy(10)">Status</th>
+          <th onclick="sortBy(0)">Submitted</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="rsvp-tbody">
+        <tr><td colspan="11" class="empty-state">Loading…</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="admin-footer">
+    <span id="last-refresh">Not yet loaded</span>
+    <span>Data is stored in your Google Sheet. Edit RSVP Status or Notes there directly.</span>
+  </div>
+</div>
+
+<!-- ══ ROW DETAIL MODAL ══ -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal-box">
+    <h3 id="modal-name">—</h3>
+    <div class="modal-field"><label>Email</label><p id="modal-email">—</p></div>
+    <div class="modal-field"><label>Phone</label><p id="modal-phone">—</p></div>
+    <div class="modal-field"><label>Attendance</label><p id="modal-attendance">—</p></div>
+    <div class="modal-field"><label>Plus One</label><p id="modal-plus">—</p></div>
+    <div class="modal-field"><label>Guest Name</label><p id="modal-guest">—</p></div>
+    <div class="modal-field"><label>Dietary</label><p id="modal-dietary">—</p></div>
+    <div class="modal-field"><label>Message</label><p id="modal-message">—</p></div>
+    <div class="modal-field"><label>Submitted</label><p id="modal-ts">—</p></div>
+    <div class="modal-field"><label>Admin Notes</label><p id="modal-notes">—</p></div>
+    <div class="modal-actions">
+      <button class="btn btn--outline btn--sm" onclick="closeModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+// CONFIG — must match apps-script/Code.gs deployment URL
+// ══════════════════════════════════════════
+const ADMIN_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwiY8DXAhW1I928rt9GT58T8pnnxt17bIxJSj5n94xqD2a6gFKoNFZ5Y3pvnBv1I2vL/exec';
+// Admin password is checked CLIENT-SIDE only (low security, sufficient for wedding privacy).
+// For stronger security, add server-side auth in Code.gs.
+const ADMIN_PASSWORD   = 'JBLmay08';  // change before deploying!
+
+// ══ AUTH ══
+function adminLogin() {
+  const pwd = document.getElementById('admin-pwd').value;
+  if (pwd === ADMIN_PASSWORD) {
+    sessionStorage.setItem('admin_auth', btoa(ADMIN_PASSWORD));
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    loadData();
+  } else {
+    document.getElementById('login-error').textContent = 'Incorrect password. Please try again.';
+  }
+}
+function adminLogout() {
+  sessionStorage.removeItem('admin_auth');
+  location.reload();
+}
+document.getElementById('admin-pwd').addEventListener('keydown', e => { if (e.key === 'Enter') adminLogin(); });
+
+// Auto-restore session
+if (sessionStorage.getItem('admin_auth') === btoa(ADMIN_PASSWORD) && ADMIN_PASSWORD !== 'YOUR_ADMIN_PASSWORD_HERE') {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+}
+
+// ══ DATA ══
+let allRows = [];   // raw rows from sheet (arrays)
+let sortCol = 0;
+let sortDir = -1;   // -1 = desc (newest first)
+
+async function loadData() {
+  document.getElementById('rsvp-tbody').innerHTML = '<tr><td colspan="11" class="empty-state">Loading…</td></tr>';
+  try {
+    // Fetch JSON export from Apps Script GET endpoint
+    const url = ADMIN_SCRIPT_URL + '?action=getData&pwd=' + encodeURIComponent(ADMIN_PASSWORD);
+    const res  = await fetch(url);
+    const json = await res.json();
+
+    if (json.error) throw new Error(json.error);
+
+    // Skip header row (index 0)
+    allRows = (json.rows || []).slice(1);
+    updateStats();
+    renderTable();
+    document.getElementById('last-refresh').textContent = 'Last refreshed: ' + new Date().toLocaleTimeString();
+  } catch (err) {
+    document.getElementById('rsvp-tbody').innerHTML =
+      `<tr><td colspan="11" class="empty-state">
+        <strong>Could not load data.</strong><br/>
+        <p>Make sure ADMIN_SCRIPT_URL is set and the Apps Script is deployed. Error: ${err.message}</p>
+        <br/><a href="#" onclick="loadData()" style="color:var(--sage-dark)">Try again</a>
+       </td></tr>`;
+  }
+}
+
+// ══ STATS ══
+function updateStats() {
+  const yes     = allRows.filter(r => r[4] === 'Yes').length;
+  const no      = allRows.filter(r => r[4] === 'No').length;
+  const plusOnes= allRows.filter(r => r[5] === 'Yes').length;
+  const pending = allRows.filter(r => !r[4]).length;
+  document.getElementById('stat-yes').textContent    = yes;
+  document.getElementById('stat-no').textContent     = no;
+  document.getElementById('stat-plus').textContent   = plusOnes;
+  document.getElementById('stat-total-guests').textContent = yes + plusOnes;
+  document.getElementById('stat-pending').textContent= pending;
+  document.getElementById('stat-total').textContent  = allRows.length;
+}
+
+// ══ RENDER TABLE ══
+function renderTable() {
+  const q        = (document.getElementById('search-input').value || '').toLowerCase();
+  const fAtt     = document.getElementById('filter-attendance').value;
+  const fStatus  = document.getElementById('filter-status').value;
+  const fDietary = document.getElementById('filter-dietary').value;
+
+  let rows = allRows.filter(r => {
+    if (q && !String(r[1]+r[2]+r[3]).toLowerCase().includes(q)) return false;
+    if (fAtt     && r[4] !== fAtt) return false;
+    if (fStatus  && r[10] !== fStatus) return false;
+    if (fDietary && !String(r[7]).toLowerCase().includes(fDietary)) return false;
+    return true;
+  });
+
+  // Sort
+  rows = rows.slice().sort((a, b) => {
+    const av = String(a[sortCol] || ''), bv = String(b[sortCol] || '');
+    return sortDir * av.localeCompare(bv, undefined, { numeric: true });
+  });
+
+  document.getElementById('result-count').textContent = rows.length + ' of ' + allRows.length + ' responses';
+
+  if (!rows.length) {
+    document.getElementById('rsvp-tbody').innerHTML =
+      '<tr><td colspan="11" class="empty-state"><strong>No responses found.</strong><p>Adjust your filters or wait for RSVPs to come in.</p></td></tr>';
+    return;
+  }
+
+  const tbody = document.getElementById('rsvp-tbody');
+  tbody.innerHTML = '';
+  rows.forEach((r, i) => {
+    const ts = r[0] ? new Date(r[0]).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }) : '—';
+    const attBadge = r[4] === 'Yes'
+      ? '<span class="badge badge--yes">Yes</span>'
+      : r[4] === 'No' ? '<span class="badge badge--no">No</span>' : '—';
+    const plusBadge = r[5] === 'Yes' ? '<span class="badge badge--yes">+1</span>' : (r[5] === 'No' ? 'No' : '—');
+    const statusBadge = r[10] === 'Confirmed'
+      ? '<span class="badge badge--confirmed">Confirmed</span>'
+      : r[10] === 'Pending' ? '<span class="badge badge--pending">Pending</span>'
+      : r[10] ? `<span class="badge badge--no">${r[10]}</span>` : '—';
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="color:var(--ink-light);font-size:.75rem;">${i+1}</td>
+      <td><strong>${esc(r[1])}</strong></td>
+      <td>${attBadge}</td>
+      <td>${plusBadge}</td>
+      <td>${esc(r[6]) || '—'}</td>
+      <td>${esc(r[7]) || '—'}</td>
+      <td style="font-size:.8rem;">${esc(r[2]) || '—'}</td>
+      <td style="font-size:.8rem;">${esc(r[3]) || '—'}</td>
+      <td>${statusBadge}</td>
+      <td style="font-size:.8rem;color:var(--ink-light);">${ts}</td>
+      <td><button class="btn btn--outline btn--sm" onclick='openModal(${JSON.stringify(r)})'>View</button></td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+// ══ SORT ══
+function sortBy(col) {
+  if (sortCol === col) sortDir *= -1; else { sortCol = col; sortDir = -1; }
+  document.querySelectorAll('thead th').forEach((th, i) => {
+    th.classList.remove('sort-asc', 'sort-desc');
+    if (i === col) th.classList.add(sortDir === 1 ? 'sort-asc' : 'sort-desc');
+  });
+  renderTable();
+}
+
+// ══ MODAL ══
+function openModal(r) {
+  document.getElementById('modal-name').textContent       = r[1] || '—';
+  document.getElementById('modal-email').textContent      = r[2] || '—';
+  document.getElementById('modal-phone').textContent      = r[3] || '—';
+  document.getElementById('modal-attendance').textContent = r[4] || '—';
+  document.getElementById('modal-plus').textContent       = r[5] || '—';
+  document.getElementById('modal-guest').textContent      = r[6] || '—';
+  document.getElementById('modal-dietary').textContent    = r[7] || 'None';
+  document.getElementById('modal-message').textContent    = r[8] || '—';
+  document.getElementById('modal-ts').textContent         = r[0] || '—';
+  document.getElementById('modal-notes').textContent      = r[11] || '—';
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeModal(e) {
+  if (!e || e.target === document.getElementById('modal-overlay')) {
+    document.getElementById('modal-overlay').classList.remove('open');
+  }
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// ══ EXPORT CSV ══
+function exportCSV() {
+  if (!allRows.length) { alert('No data to export.'); return; }
+  const headers = ['Timestamp','Name','Email','Phone','Attendance','Plus One','Guest Name','Dietary','Message','IP Hint','RSVP Status','Notes'];
+  const csvRows = [headers, ...allRows];
+  const csv = csvRows.map(r => r.map(c => {
+    const s = String(c || '').replace(/"/g, '""');
+    return /[",\n]/.test(s) ? `"${s}"` : s;
+  }).join(',')).join('\n');
+
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url;
+  a.download = `rsvps_export_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ══ UTILS ══
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+</script>
+</body>
+</html>

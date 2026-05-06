@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Wedding Invitation – Please RSVP" />
+  <!-- Prevent search indexing for privacy -->
+  <meta name="robots" content="noindex, nofollow" />
+  <title>You're Invited ✦ [COUPLE_NAME_1] & [COUPLE_NAME_2]</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════
+       HERO / INVITATION HEADER
+  ═══════════════════════════════════════════ -->
+  <header class="hero" id="top">
+    <div class="hero__botanical hero__botanical--left" aria-hidden="true"></div>
+    <div class="hero__botanical hero__botanical--right" aria-hidden="true"></div>
+
+    <div class="hero__content">
+      <p class="hero__pretitle">Together with their families</p>
+      <h1 class="hero__names">
+        <span class="name name--one">Jomhen Bobier</span>
+        <span class="ampersand">&amp;</span>
+        <span class="name name--two">Beth Garlando</span>
+      </h1>
+      <p class="hero__subtitle">joyfully request your presence at their wedding</p>
+
+      <div class="divider" aria-hidden="true"><span>✦</span></div>
+
+      <!-- EVENT DETAILS -->
+      <div class="details-grid">
+        <div class="detail-item">
+          <span class="detail-label">Date</span>
+          <span class="detail-value">Saturday, May 08, 2027</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Time</span>
+          <span class="detail-value">4:00 PM onwards</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Ceremony</span>
+          <span class="detail-value">Blue Gardens Wedding and Events Venue<br/>28 Samonte Street via North Zuzuaregui Road, Commonwealth Ave, Quezon City, 1119 Metro Manila</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Reception</span>
+          <span class="detail-value">Also at the Blue Gardens<br/></span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Dress Code</span>
+          <span class="detail-value">Smart Casual<br/><em>Do not wear white dress for women.</em></span>
+        </div>
+      </div>
+
+      <!-- MAP LINK -->
+      <a class="btn btn--outline map-btn"
+         href="[GOOGLE_MAPS_URL]"
+         target="_blank" rel="noopener noreferrer">
+        ↗ View on Google Maps
+      </a>
+
+      <!-- OPTIONAL NOTE -->
+      <div class="note-box" id="couple-note">
+        <p>[OPTIONAL_COUPLE_NOTE — e.g. "Please note parking is available on-site. Ceremony doors open 30 minutes before. We look forward to celebrating with you!"]</p>
+      </div>
+
+      <a href="#rsvp" class="btn btn--primary">RSVP Now</a>
+    </div>
+  </header>
+
+  <!-- ═══════════════════════════════════════════
+       RSVP FORM SECTION
+  ═══════════════════════════════════════════ -->
+  <section class="rsvp-section" id="rsvp">
+    <div class="section-header">
+      <h2>Kindly Reply</h2>
+      <p class="section-sub">Please respond by <strong>[RSVP_DEADLINE]</strong></p>
+    </div>
+
+    <!-- Success state (hidden by default) -->
+    <div class="form-success" id="form-success" aria-live="polite" hidden>
+      <div class="success-icon">✦</div>
+      <h3>Thank you!</h3>
+      <p>Your RSVP has been received. We'll be in touch soon.</p>
+      <button class="btn btn--outline" onclick="resetForm()">Submit another RSVP</button>
+    </div>
+
+    <!-- Error state (hidden by default) -->
+    <div class="form-error" id="form-error" aria-live="polite" hidden>
+      <p>⚠ Something went wrong. Please try again or contact us at <a href="mailto:[CONTACT_EMAIL]">[CONTACT_EMAIL]</a>.</p>
+    </div>
+
+    <form class="rsvp-form" id="rsvp-form" novalidate>
+
+      <!-- Full Name -->
+      <div class="field-group">
+        <label for="name">Full Name <span class="required" aria-label="required">*</span></label>
+        <input type="text" id="name" name="name" placeholder="Your full name"
+               autocomplete="name" required maxlength="120" />
+        <span class="field-error" id="name-error" aria-live="polite"></span>
+      </div>
+
+      <!-- Email -->
+      <div class="field-group">
+        <label for="email">
+          Email Address
+          <span class="field-hint">(at least one contact method required)</span>
+        </label>
+        <input type="email" id="email" name="email" placeholder="your@email.com"
+               autocomplete="email" maxlength="200" />
+        <span class="field-error" id="email-error" aria-live="polite"></span>
+      </div>
+
+      <!-- Phone -->
+      <div class="field-group">
+        <label for="phone">
+          Mobile Number
+          <span class="field-hint">(or email above)</span>
+        </label>
+        <input type="tel" id="phone" name="phone" placeholder="+63 9XX XXX XXXX"
+               autocomplete="tel" maxlength="30" />
+        <span class="field-error" id="phone-error" aria-live="polite"></span>
+      </div>
+
+      <!-- Attendance -->
+      <div class="field-group">
+        <fieldset>
+          <legend>Will you be attending? <span class="required" aria-label="required">*</span></legend>
+          <div class="radio-group">
+            <label class="radio-label">
+              <input type="radio" name="attendance" value="yes" required />
+              <span class="radio-custom"></span>
+              Joyfully accepts
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="attendance" value="no" />
+              <span class="radio-custom"></span>
+              Regretfully declines
+            </label>
+          </div>
+        </fieldset>
+        <span class="field-error" id="attendance-error" aria-live="polite"></span>
+      </div>
+
+      <!-- Plus One (shown only if attending = yes) -->
+      <div class="field-group" id="plus-one-section" hidden>
+        <fieldset>
+          <legend>Are you bringing a plus one?</legend>
+          <div class="radio-group">
+            <label class="radio-label">
+              <input type="radio" name="plus_one" value="yes" id="plus-one-yes" />
+              <span class="radio-custom"></span>
+              Yes, bringing a guest
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="plus_one" value="no" id="plus-one-no" />
+              <span class="radio-custom"></span>
+              No, attending solo
+            </label>
+          </div>
+        </fieldset>
+      </div>
+
+      <!-- Plus One Name (shown only if plus_one = yes) -->
+      <div class="field-group" id="plus-one-name-section" hidden>
+        <label for="plus_one_name">
+          Guest's Full Name <span class="required" aria-label="required">*</span>
+        </label>
+        <input type="text" id="plus_one_name" name="plus_one_name"
+               placeholder="Your guest's name" maxlength="120" />
+        <span class="field-error" id="plus-one-name-error" aria-live="polite"></span>
+      </div>
+
+      <!-- Dietary Requirements -->
+      <div class="field-group">
+        <label for="dietary">Dietary Requirements</label>
+        <select id="dietary" name="dietary">
+          <option value="">No restrictions</option>
+          <option value="vegetarian">Vegetarian</option>
+          <option value="vegan">Vegan</option>
+          <option value="halal">Halal</option>
+          <option value="gluten-free">Gluten-free</option>
+          <option value="nut-allergy">Nut allergy</option>
+          <option value="other">Other (specify in message)</option>
+        </select>
+      </div>
+
+      <!-- Message -->
+      <div class="field-group">
+        <label for="message">Message for the Couple <span class="field-hint">(optional)</span></label>
+        <textarea id="message" name="message" placeholder="Share your well wishes…"
+                  rows="3" maxlength="500"></textarea>
+        <span class="char-count" id="message-count">0 / 500</span>
+      </div>
+
+      <!-- Privacy note -->
+      <p class="privacy-note">
+        🔒 Your details are used only to confirm your attendance and for wedding coordination.
+        They will not be shared with third parties.
+        See our <a href="#privacy">privacy note</a> below.
+      </p>
+
+      <!-- Submit -->
+      <button type="submit" class="btn btn--primary btn--full" id="submit-btn">
+        <span class="btn-text">Send My RSVP</span>
+        <span class="btn-loading" hidden>Sending…</span>
+      </button>
+
+    </form>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       PRIVACY NOTE
+  ═══════════════════════════════════════════ -->
+  <section class="privacy-section" id="privacy">
+    <h3>Privacy Notice</h3>
+    <p>
+      We collect your name, contact details, attendance status, dietary preferences, and optional message
+      solely to coordinate our wedding. Your information is stored securely in a private Google Sheet
+      accessible only to the couple. We do not sell, share, or disclose your data to any third party.
+      You may request removal of your data at any time by emailing
+      <a href="mailto:[CONTACT_EMAIL]">[CONTACT_EMAIL]</a>.
+      Data will be deleted within 90 days after the wedding.
+    </p>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       FOOTER
+  ═══════════════════════════════════════════ -->
+  <footer class="footer">
+    <p>Made with love for [COUPLE_NAME_1] &amp; [COUPLE_NAME_2] · [YEAR]</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
