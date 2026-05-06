@@ -12,8 +12,8 @@
 // ══════════════════════════════════════════
 // CONFIG — edit before deploying
 // ══════════════════════════════════════════
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwiY8DXAhW1I928rt9GT58T8pnnxt17bIxJSj5n94xqD2a6gFKoNFZ5Y3pvnBv1I2vL/exec';
-const ACCESS_CODE = '';           // '' = no gate. Set e.g. 'smith2025' to require a code.
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxBOmNZF2hrvpnb8TwASgtw2apET1yJxgAuAq2dIv-9WvNWn-3kyYAWDaoCIuGzrA22/exec';
+const ACCESS_CODE = 'JBLmay08';           // '' = no gate. Set e.g. 'smith2025' to require a code.
 const COUPLE_NAMES = '[COUPLE_NAME_1] & [COUPLE_NAME_2]'; // used in page title after access
 
 
@@ -207,7 +207,7 @@ form.addEventListener('submit', async (e) => {
   submitBtn.querySelector('.btn-loading').hidden = false;
 
   try {
-    if (!SCRIPT_URL || SCRIPT_URL === 'YOUR_APPS_SCRIPT_WEB_APP_URL_HERE') {
+    if (!SCRIPT_URL || SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbxBOmNZF2hrvpnb8TwASgtw2apET1yJxgAuAq2dIv-9WvNWn-3kyYAWDaoCIuGzrA22/exec') {
       throw new Error('SCRIPT_URL not configured — see app.js setup instructions.');
     }
 
