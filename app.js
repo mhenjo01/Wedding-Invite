@@ -212,11 +212,14 @@ form.addEventListener('submit', async (e) => {
     }
 
     // Google Apps Script requires no-cors for form submissions from GitHub Pages
+    const formData = new URLSearchParams();
+    Object.keys(data).forEach(key => formData.append(key, data[key]));
+
     await fetch(SCRIPT_URL, {
       method: 'POST',
       mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: formData.toString(),
     });
 
     // no-cors means we can't read the response body, so assume success
