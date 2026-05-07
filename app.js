@@ -207,7 +207,7 @@ form.addEventListener('submit', async (e) => {
   submitBtn.querySelector('.btn-loading').hidden = false;
 
   try {
-    if (!SCRIPT_URL || SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbxBOmNZF2hrvpnb8TwASgtw2apET1yJxgAuAq2dIv-9WvNWn-3kyYAWDaoCIuGzrA22/exec') {
+    if (!SCRIPT_URL || SCRIPT_URL === 'YOUR_APPS_SCRIPT_WEB_APP_URL_HERE') {
       throw new Error('SCRIPT_URL not configured — see app.js setup instructions.');
     }
 
